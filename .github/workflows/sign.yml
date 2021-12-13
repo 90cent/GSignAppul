@@ -1,19 +1,49 @@
-name: CI
-
-on:
-  workflow_dispatch:
-
-jobs:
-  sign:
-    runs-on: macos-11
-    timeout-minutes: 30
-    env:
-      SECRET_URL: "${{ secrets.SECRET_URL }}"
-      SECRET_KEY: "${{ secrets.SECRET_KEY }}"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Sign
-        run: |
-          sudo xcode-select -s /Applications/Xcode_12.5.1.app
-          ./sign.sh
+# configure the builder(s) you created in the previous section
+builder:
+  # GitHub Actions
+  github:
+    enable: false
+    # the name you gave your builder repository
+    repo_name: SignTools-CI
+    # your GitHub profile/organization name
+    org_name: YOUR_ORG_NAME
+    workflow_file_name: sign.yml
+    # your GitHub personal access token that you created with the builder
+    token: YOUR_GITHUB_TOKEN
+    ref: master
+  # Semaphore CI
+  semaphore:
+    enable: false
+    # the name you gave to your Semaphore CI project
+    project_name: YOUR_PROJECT_NAME
+    # your Semaphore CI profile/organization name
+    org_name: YOUR_ORG_NAME
+    # your Semaphore CI token that you got when creating the builder
+    token: YOUR_SEMAPHORE_TOKEN
+    ref: refs/heads/master
+    secret_name: ios-signer
+  # your own self-hosted Mac builder
+  selfhosted:
+    enable: false
+    # the url of your builder
+    url: http://192.168.1.133:8090
+    # the auth key you used when you started the builder
+    key: SOME_SECRET_KEY
+# the base url used by the builder to reach this server
+# leave empty if using a tunnel provider, it will set this automatically
+server_url: https://mywebsite.com
+# whether to redirect all http requests to https
+redirect_https: false
+# where to save data like apps and signing profiles
+save_dir: data
+# how often does the cleanup job run
+cleanup_interval_mins: 1
+# apps that have been processing for more than this time will be marked as failed
+sign_timeout_mins: 15
+# this protects the web ui with a username and password
+# definitely enable it if you are using a tunnel provider
+basic_auth:
+  enable: false
+  username: "admin"
+  # don't forget to change the password
+  password: "admin"
